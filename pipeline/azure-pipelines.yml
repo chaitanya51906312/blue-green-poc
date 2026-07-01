@@ -1,0 +1,85 @@
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  azureSubscription: Azure-Service-Connection
+  appName: bluegreen-demo-app
+  resourceGroup: RG-BlueGreen
+  slotName: staging
+
+stages:
+
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+
+    - task: DotNetCoreCLI@2
+      displayName: Build Application
+      inputs:
+        command: publish
+        publishWebProjects: true
+        arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: drop
+
+- stage: DeployToStaging
+  dependsOn: Build
+
+  jobs:
+  - deployment: Deploy
+    environment: staging
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+
+          - download: current
+            artifact: drop
+
+          - task: AzureWebApp@1
+            displayName: Deploy To Staging Slot
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: webApp
+              appName: '$(appName)'
+              deployToSlotOrASE: true
+              resourceGroupName: '$(resourceGroup)'
+              slotName: '$(slotName)'
+              package: '$(Pipeline.Workspace)/drop/**/*.zip'
+
+- stage: Validation
+  dependsOn: DeployToStaging
+
+  jobs:
+  - job: Validate
+
+    steps:
+    - task: PowerShell@2
+      displayName: Validate Staging Slot
+      inputs:
+        filePath: scripts/validate-staging.ps1
+
+- stage: SwapProduction
+  dependsOn: Validation
+
+  jobs:
+  - job: Swap
+
+    steps:
+    - task: AzureAppServiceManage@0
+      displayName: Swap Slot
+
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        WebAppName: '$(appName)'
+        ResourceGroupName: '$(resourceGroup)'
+        SourceSlot: 'staging'
+        SwapWithProduction: true
