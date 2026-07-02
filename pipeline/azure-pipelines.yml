@@ -6,8 +6,8 @@ pool:
 
 variables:
   azureSubscription: Azure-Service-Connection
-  appName: bluegreen-demo-app
-  resourceGroup: RG-BlueGreen
+  appName: BLUE-GREEN-DEPLOYMENT
+  resourceGroup: demo-rg
   slotName: staging
 
 stages:
