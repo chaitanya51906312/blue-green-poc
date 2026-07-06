@@ -1,0 +1,45 @@
+Blue-Green Deployment POC – Demo Notes 
+
+Objective 
+
+The objective of this POC was to implement a Blue-Green deployment strategy on Azure App Service using Azure DevOps pipelines, enabling zero-downtime deployments and easy rollback capabilities. 
+
+Environment Setup 
+
+Created an Azure App Service named BLUE-GREEN-DEPLOYMENT in demo-rg. Initially the App Service Plan did not support deployment slots. After identifying the limitation, the plan was upgraded to Standard S1 to enable deployment slot functionality. 
+
+Source Code and Repository 
+
+The application source code, deployment scripts, validation scripts, and Azure DevOps YAML pipeline were maintained in a Git repository. 
+
+Azure DevOps Pipeline 
+
+Implemented a multi-stage YAML pipeline: Build → DeployToStaging → Validation → SwapProduction. 
+
+Initial Challenge 
+
+The deployment initially failed because the pipeline attempted to deploy to a staging slot that did not exist. The App Service Plan did not support deployment slots. 
+
+Resolution 
+
+Upgraded the App Service Plan to Standard S1 and created a staging deployment slot by cloning production settings. 
+
+Deployment Validation 
+
+Successfully deployed the application to the staging slot and validated application availability and deployment health. 
+
+Slot Swap 
+
+Performed a slot swap to move the validated application from staging to production with zero downtime. 
+
+Rollback Strategy 
+
+Rollback can be achieved by swapping the slots again, restoring the previous version within seconds. 
+
+Key Learnings 
+
+Azure App Service, Deployment Slots, Azure DevOps YAML Pipelines, Blue-Green Deployment, Slot Swapping, Validation Automation, Zero-Downtime Deployment, and Rollback Strategies. 
+
+Conclusion 
+
+Successfully implemented an end-to-end Blue-Green deployment solution using Azure App Service and Azure DevOps, enabling safer releases, automated validation, rapid rollback, and zero-downtime deployments. 
