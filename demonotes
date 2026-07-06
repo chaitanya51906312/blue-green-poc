@@ -11,7 +11,8 @@ Created an Azure App Service named BLUE-GREEN-DEPLOYMENT in demo-rg. Initially t
 Source Code and Repository 
 
 The application source code, deployment scripts, validation scripts, and Azure DevOps YAML pipeline were maintained in a Git repository. 
-
+Azure Environment:
+"The staging slot was cloned from production to maintain configuration consistency."
 Azure DevOps Pipeline 
 
 Implemented a multi-stage YAML pipeline: Build → DeployToStaging → Validation → SwapProduction. 
@@ -31,7 +32,7 @@ Successfully deployed the application to the staging slot and validated applicat
 Slot Swap 
 
 Performed a slot swap to move the validated application from staging to production with zero downtime. 
-
+"In case of a production issue, we can immediately execute the rollback script. The script performs a slot swap between Production and Staging, reverting to the previously known-good version within seconds, without requiring a fresh deployment."
 Rollback Strategy 
 
 Rollback can be achieved by swapping the slots again, restoring the previous version within seconds. 
